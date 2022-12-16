@@ -27,5 +27,9 @@ public class AccountsService {
         return repo.findAccountByCid(id);
     }
     
+    public Account getAccountByAno(String ano) {
+        return repo.findAccountByAno(ano);
+    }
+    
 	
 }

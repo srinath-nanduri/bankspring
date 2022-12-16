@@ -1,6 +1,8 @@
 package cbank.cust.controller;
 
+import java.sql.Date;
 import java.util.Arrays;
+//import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import cbank.cust.entity.Account;
 import cbank.cust.entity.Customer;
 import cbank.cust.entity.Issues;
 import cbank.cust.entity.Loan;
+import cbank.cust.entity.Payment;
 import cbank.cust.entity.Transactions;
 import cbank.cust.service.AadharService;
 import cbank.cust.service.AccountsService;
@@ -20,6 +23,7 @@ import cbank.cust.service.FeedbackService;
 import cbank.cust.service.IssuesService;
 import cbank.cust.service.LoanService;
 import cbank.cust.service.TransactionsService;
+import jakarta.transaction.Transaction;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -176,6 +180,71 @@ public class CustomerController {
         return aadharservice.saveAadhar(Aadhar);
     }
     
+ 
+ 
+ 	@PostMapping("/makePayment")
+ 	public String makePayment(@RequestBody Payment p) {
+ 		Account sacc = aservice.getAccountById(p.getId());
+ 		Account racc = aservice.getAccountByAno(p.getRaccno());
+ 		
+ 		if(sacc.getApin().equals(p.getPin())) {
+ 			if(sacc.getAbal() > p.getAmt()) {
+ 				double sbal = sacc.getAbal();
+ 				double rbal = racc.getAbal();
+ 				double amt = p.getAmt();
+ 				
+ 				sacc.setAbal(sbal-amt);
+ 				racc.setAbal(rbal+amt);
+
+ 				aservice.saveAccount(sacc);
+ 				aservice.saveAccount(racc);
+ 				
+ 				
+ 				Transactions st = new Transactions();
+ 				Transactions rt = new Transactions();
+ 				
+ 				st.setCid(sacc.getCid());
+ 				rt.setCid(racc.getCid());
+ 				
+ 				java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
+ 				
+ 				st.setTdate(sqlDate);
+ 				rt.setTdate(sqlDate);
+ 				
+ 				java.sql.Time sqlTime = new java.sql.Time(System.currentTimeMillis());
+ 		 		
+ 				st.setTtime(sqlTime);
+ 				rt.setTtime(sqlTime);
+ 				
+ 				st.setTwithdraw(amt);
+ 				rt.setTdeposit(amt);
+ 				
+ 				st.setTdeposit(0.0);
+ 				rt.setTwithdraw(0.0);
+ 				
+ 				st.setTbalance(sacc.getAbal());
+ 				rt.setTbalance(racc.getAbal());
+ 				
+ 				tservice.saveTransactions(st);
+ 				tservice.saveTransactions(rt);
+ 				
+ 				
+ 				return "Money Sent";
+ 				
+ 				
+ 			}
+ 		}
+ 		
+ 		else {
+ 			return "Wrong pin";
+ 		}
+		return "Thank you";
+ 		
+ 		
+ 		
+
+ 		
+ 	}
     
 
    

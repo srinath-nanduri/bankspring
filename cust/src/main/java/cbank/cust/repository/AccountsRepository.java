@@ -8,4 +8,6 @@ public interface AccountsRepository extends JpaRepository<Account, Integer>{
 
 	Account findAccountByCid(int id);
 	
+	Account findAccountByAno(String ano);
+	
 }
