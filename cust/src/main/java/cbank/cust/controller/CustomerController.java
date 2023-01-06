@@ -1,11 +1,16 @@
 package cbank.cust.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Date;
+
 import java.util.Arrays;
 //import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.web.bind.annotation.*;
 
 import cbank.cust.entity.Feedback;
@@ -23,7 +28,8 @@ import cbank.cust.service.FeedbackService;
 import cbank.cust.service.IssuesService;
 import cbank.cust.service.LoanService;
 import cbank.cust.service.TransactionsService;
-import jakarta.transaction.Transaction;
+import jakarta.mail.MessagingException;
+import cbank.cust.service.EmailSenderService;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -49,6 +55,9 @@ public class CustomerController {
 	
 	@Autowired
 	private AadharService aadharservice;
+	
+	@Autowired
+	private EmailSenderService eservice;
 
     @PostMapping("/addCustomer")
     public Customer addCustomer(@RequestBody Customer Customer) {
@@ -200,6 +209,8 @@ public class CustomerController {
  				aservice.saveAccount(racc);
  				
  				
+ 				
+ 				
  				Transactions st = new Transactions();
  				Transactions rt = new Transactions();
  				
@@ -245,6 +256,20 @@ public class CustomerController {
 
  		
  	}
+ 	
+ 	
+ 	@GetMapping("/sendEmail")
+ 	public void triggerMail(){
+ 		
+ 		
+//			final ByteArrayResource inputStream = new ByteArrayResource(Files.readAllBytes(Paths.get(
+//			        "C:/Users/Srinath.Nanduri/OneDrive - Brillio/Desktop/me_pic.jpg")));
+			eservice.sendSimpleEmail("srinathnasa123@gmail.com", "Hi guys!", "Test");
+	
+		
+
+
+	}
     
 
    
